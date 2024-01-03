@@ -13,35 +13,29 @@ def get_list():
     load_dotenv()
     user = os.getenv('KEEP_USER')
     pwd = os.getenv('KEEP_PWD')
-    # print(user)
-    # print(pwd)
-    
-
     keep = gkeepapi.Keep()
     success = keep.login(user, pwd)
 
     if(success == True):
         gnotes = keep.get(os.getenv('KEEP_LIST'))
-        # print(gnotes.title)
-        # print(gnotes.text)
         return f'{gnotes.title} \n\n{gnotes.text}'
 
 
-# TODO:TH Having issues login in to Harris Teeters. Fails auth/sigin
 def login_harris_teeters(driver):
     load_dotenv()
     username = os.getenv('SHOP_USERID')
     pw = os.getenv('SHOP_PWD')
-    driver.get("https://www.harristeeter.com/signin?redirectUrl=/savings/cl/coupons/")
+    driver.get("https://www.harristeeter.com")
+    driver.find_element(By.XPATH, "/html/body/div[1]/div/div[3]/div[6]/div/div/div/div[6]/div/div/div/button").click() # Click sign in
+    sleep(1)
+    driver.find_element(By.XPATH, "/html/body/div[1]/div/div[3]/div[6]/div/div/div/div[6]/div/div/div/div/div/div/ul/li[1]/button").click()
+    sleep(3)
     sleep(2)
     driver.find_element(By.XPATH, "//input[@name=\"email\"]").send_keys(username)
     sleep(1)
     driver.find_element(By.XPATH, "//input[@name=\"password\"]").send_keys(pw)
     sleep(3)
-    driver.find_element(By.XPATH, "//input[@name=\"password\"]").send_keys(Keys.ENTER)
-    # driver.find_element(By.XPATH, "//input[@name=\"rememberMe\"]").click()
-    # driver.find_element(By.XPATH, "//input[@name=\"termsAndConditions\"]").click()
-    # driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div/main/section/section/section/form/button").click() # Login
+    driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div/main/section/section/section/form/button").click() # Login
     sleep(5)
 
 
@@ -74,13 +68,9 @@ if __name__ == "__main__":
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    # options.add_argument("--auto-open-devtools-for-tabs")
-    # user_data_directory = '/Users/tommyho/Library/Application Support/Google/Chrome/Default'
-    # options.add_argument(f'--user-data-dir={user_data_directory}')
     driver = uc.Chrome(options=options)
     driver.maximize_window()
 
     login_harris_teeters(driver)
-    # sleep(6000)
     apply_harris_teeter_coupons(driver, list_arr)
 
