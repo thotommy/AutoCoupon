@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from selenium.webdriver.common.keys import Keys
 import random
+from seleniumbase import SB
 # Needs to use python version 3.8.18
 
 # Constants
@@ -81,6 +82,21 @@ def login_publix(driver):
     load_dotenv()
     username = os.getenv('SHOP_USERID')
     pw = os.getenv('SHOP_PWD')
+    # This also worked
+    # with SB(uc=True) as sb:
+    #     sb.open("https://www.publix.com/")
+    #     sb.click('//*[@id=\"userLogIn\"]')
+    #     sb.type('input[name="Email address"]', username)
+    #     sleep(random.uniform(1,3))
+    #     sb.type('//input[@name=\"Password\"]', pw)
+    #     sleep(random.uniform(1,3))
+    #     sb.click('//button[@id=\"next\"]')
+    #     sleep(20)
+    driver.execute_script("window.open('','_blank');")
+    sleep(2)
+    driver.get("https://www.publix.com/")
+    sleep(2)
+    driver.switch_to.window(driver.window_handles[1])
     driver.get("https://www.publix.com/")
     sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//*[@id=\"userLogIn\"]").click()
