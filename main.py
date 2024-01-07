@@ -92,21 +92,23 @@ def login_publix(driver):
     #     sleep(random.uniform(1,3))
     #     sb.click('//button[@id=\"next\"]')
     #     sleep(20)
-    driver.execute_script("window.open('','_blank');")
+    # driver.execute_script("window.open('','_blank');")
+    # sleep(2)
+    driver.get("https://www.publix.com/login")
     sleep(2)
-    driver.get("https://www.publix.com/")
-    sleep(2)
-    driver.switch_to.window(driver.window_handles[1])
-    driver.get("https://www.publix.com/")
-    sleep(random.uniform(1,5))
-    driver.find_element(By.XPATH, "//*[@id=\"userLogIn\"]").click()
-    sleep(random.uniform(1,5))
+    # driver.switch_to.window(driver.window_handles[1])
+    # driver.get("https://www.publix.com/")
+    # sleep(random.uniform(1,5))
+    # driver.find_element(By.XPATH, "//*[@id=\"userLogIn\"]").click()
+    # sleep(random.uniform(1,5))
+    driver.get("https://www.publix.com/login")
+    sleep(random.uniform(1,3))
     driver.find_element(By.XPATH, "//input[@name=\"Email address\"]").send_keys(username)
     sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//input[@name=\"Password\"]").send_keys(pw)
     sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//button[@id=\"next\"]").click()
-    sleep(10)
+    #sleep(10000)
 
 
 def apply_publix_coupons(driver, list_arr):
@@ -170,12 +172,18 @@ def try_and_click_if_exists(driver, xpath):
 
 if __name__ == "__main__":
     
-    list = get_list(PUBLIX)
-    lines = list.split('\n')
+    publix_list = get_list(PUBLIX)
+    harris_teeter_list = get_list(HARRIS_TEETER)
+    p_lines = publix_list.split('\n')
+    h_lines = harris_teeter_list.split('\n')
 
     # Remove ☑ or ☐ from each line
-    list_arr = [line.replace('☑', '').replace('☐', '').strip() for line in lines]
-    print(list_arr)
+    p_list_arr = [line.replace('☑', '').replace('☐', '').strip() for line in p_lines]
+    print("Publix list")
+    print(p_list_arr)
+    h_list_arr = [line.replace('☑', '').replace('☐', '').strip() for line in h_lines]
+    print("Harris Teeters list")
+    print(h_list_arr)
     
     
     print('Starting Chrome Driver')
@@ -186,10 +194,9 @@ if __name__ == "__main__":
     driver.maximize_window()
 
     login_publix(driver)
-    apply_publix_coupons(driver, list_arr)
-
-    ''' 
+    apply_publix_coupons(driver, p_list_arr)
+    
     login_harris_teeters(driver)
-    apply_harris_teeter_coupons(driver, list_arr)
-    '''
+    apply_harris_teeter_coupons(driver, h_list_arr)
+    
 
