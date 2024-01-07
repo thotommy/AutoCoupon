@@ -2,11 +2,12 @@ from selenium import webdriver
 import undetected_chromedriver as uc
 from time import sleep
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import ElementNotInteractableException
+from selenium.common.exceptions import ElementNotInteractableException, NoSuchElementException
 import gkeepapi
 from dotenv import load_dotenv
 import os
 from selenium.webdriver.common.keys import Keys
+import random
 # Needs to use python version 3.8.18
 
 # Constants
@@ -62,7 +63,7 @@ def apply_harris_teeter_coupons(driver, list_arr):
     driver.get("https://www.harristeeter.com/coupons/")
     sleep(5)
     for item in list_arr:
-        if '==' in item:
+        if '==' in item or '' in item:
             continue
         print(f'Finding coupons for {item}')
         driver.find_element(By.XPATH, "/html/body/div[1]/div/div[4]/div[1]/main/section/div/section/section/section/div/div[1]/div/div[2]/div[1]/div/input").clear()
@@ -81,13 +82,13 @@ def login_publix(driver):
     username = os.getenv('SHOP_USERID')
     pw = os.getenv('SHOP_PWD')
     driver.get("https://www.publix.com/")
-    sleep(3)
+    sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//*[@id=\"userLogIn\"]").click()
-    sleep(5)
+    sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//input[@name=\"Email address\"]").send_keys(username)
-    sleep(2)
+    sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//input[@name=\"Password\"]").send_keys(pw)
-    sleep(1)
+    sleep(random.uniform(1,5))
     driver.find_element(By.XPATH, "//button[@id=\"next\"]").click()
     sleep(10)
 
@@ -97,20 +98,22 @@ def apply_publix_coupons(driver, list_arr):
     driver.get("https://www.publix.com/savings/digital-coupons?nav=header")
     sleep(5)
     for item in list_arr:
-        if '==' in item:
+        if '==' in item or not item:
             continue
         print(f'Finding coupons for {item}')
-        driver.find_element(By.XPATH, "/html/body/div[1]/section/div[4]/div/div[2]/div[1]/div[2]/div/div[1]/form/input").clear()
+        try_and_click_if_exists(driver, "/html/body/div[1]/section/div[4]/div/div[2]/div[1]/div[2]/div/div[1]/form/button")
         driver.find_element(By.XPATH, "/html/body/div[1]/section/div[4]/div/div[2]/div[1]/div[2]/div/div[1]/form/input").send_keys(item)
         driver.find_element(By.XPATH, "/html/body/div[1]/section/div[4]/div/div[2]/div[1]/div[2]/div/div[1]/form/input").send_keys(Keys.ENTER)
-        sleep(4)
-        #TODO: Need to figure out how to get a list of Clip coupon buttons and click them using selenium
-        clip_buttons = driver.find_elements(By.XPATH, "//button[contains(text(), 'Clip coupon')]")
-        print(len(clip_buttons))
+        sleep(random.uniform(1, 5))
+        clip_buttons = driver.find_elements(By.XPATH, "//button[@aria-label=\"Clip coupon\"]")
+        print(f"Found {len(clip_buttons)} coupons")
         if(len(clip_buttons) == 0):
             continue
         for clip_button in clip_buttons:
             clip_button.click()
+            # sleep(random.uniform(1,2))
+            # if(len(driver.find_elements(By.XPATH, "//*[@id=\"userLogIn\"]")) != 0):
+            #     login_publix(driver)
 
 
 def login_target(driver):
@@ -139,6 +142,15 @@ def apply_target_coupons(driver, list_arr):
     does not have a great way to clip coupons.
     '''
     pass
+
+
+# Helper Methods
+def try_and_click_if_exists(driver, xpath):
+    try:
+        driver.find_element(By.XPATH, xpath).click()
+    except (ElementNotInteractableException, NoSuchElementException):
+        print(f"Skipping..element \"{xpath}\" does not exist or can not be interacted.")
+
 
 if __name__ == "__main__":
     
